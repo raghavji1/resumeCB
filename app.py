@@ -14,8 +14,8 @@ from utils import *
 
 import json
 load_dotenv()
-# PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
-# OPENAI_API_KEY=os.environ.get('OPENAI_API_KEY')
+PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
+OPENAI_API_KEY=os.environ.get('OPENAI_API_KEY')
 
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
