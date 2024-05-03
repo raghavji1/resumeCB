@@ -46,7 +46,7 @@ def get_response(user_input):
 # push_to_pinecone(PINECONE_API_KEY,"gcp-starter","qa",embeddings,data)
 
 # app config
-st.set_page_config(page_title="Chat with Your Websites", page_icon="🤖")
+st.set_page_config(page_title="Find Your Fav Job", page_icon="🕵️‍♀️")
 
 # session state
 if "chat_history" not in st.session_state:
@@ -58,8 +58,7 @@ if "vector_store" not in st.session_state:
 
 
 #upload resume function 
-upload_resume()
-      
+
 st.header('NaukariDhoondho ChatBot ')
 st.text('Powerd by OpenAI')
 
@@ -76,7 +75,6 @@ for message in st.session_state.chat_history :
 
 
 if user_query:
-
     response = get_response(user_query)
     # Display user's question
     with st.chat_message("You"):
@@ -85,9 +83,6 @@ if user_query:
     # Display AI's answer
     with st.chat_message("AI"):
         st.markdown(response)
-
-
-   
 
     # Update chat history
     st.session_state.chat_history.append(HumanMessage(content=user_query))

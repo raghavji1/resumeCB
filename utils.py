@@ -52,7 +52,7 @@ def save_vector_store(text_chunks,embeddings):
 
     return st.write("vector Store is Saved")
 
-
+@st.cache_data
 def get_pdf_text(pdf_doc):
     text = ""
     pdf_reader = PdfReader(pdf_doc)
@@ -60,6 +60,7 @@ def get_pdf_text(pdf_doc):
         text += page.extract_text()
     return text
 
+@st.cache_data
 def create_docs(user_pdf_list, unique_id):
     docs=[]
     for filename in user_pdf_list:
@@ -77,7 +78,7 @@ def create_docs(user_pdf_list, unique_id):
 
 
 
-
+@st.cache_data
 def push_to_pinecone(pinecone_apikey,pinecone_environment,pinecone_index_name,embeddings,docs):
     text_splitter = RecursiveCharacterTextSplitter()
     document_chunks = text_splitter.split_documents(docs)
@@ -110,58 +111,37 @@ def upload_resume():
                 st.sidebar.write("*Resumes uploaded* :"+str(len(final_docs_list)))
                 document_response(final_docs_list)
 
-
-def  generate_response_jobseker(user_input):
-    if user_input.lower() == "job seeker":
-        upload_resume()
-        prompt=ChatPromptTemplate.from_messages([
-      ("system", "you are an AI Chatbot who first ask user that which language he will prefer for example HINDI, ENGLISH, or HINGLISH(if hinglish-for exmaple, namaste me aapke liye kya kr skta hu  ) for communication. than you will ask him options like who he is JOB SEEKE, when they enter their identity , if the user is 'Job Seaker' than you will ask him in which sector he want to do job, you will find the skills/ if he is software based than you will find the languages what he know in his resume what he will upload ,and ask them to upload their students resume:\n\n{context}"),
-      MessagesPlaceholder(variable_name="chat_history"),
-      ("user", "{input}"),
-    ])
-    return prompt
-
-def recruiter(user_input):
-    if user_input.lower() == "recruiter":
-        prompt=ChatPromptTemplate.from_messages([
-    ("system", "you are an AI Chatbot who first ask user that which language he will prefer for example HINDI, ENGLISH, or HINGLISH(if hinglish-for exmaple, namaste me aapke liye kya kr skta hu  ) for communication. than you will ask him options like who he is JOB SEEKER, RECRUTERM or INSTITUTE, when they enter their identity , if he is 'recruiter' than you will ask him in what sector he want to hire, you will ask him the prefer language and the location than we will provide the number of the resume and the names in the resumes what we have which have matching the requirements of the recriter :\n\n{context}"),
-      MessagesPlaceholder(variable_name="chat_history"),
-      ("user", "{input}"),
-    ])
-    return prompt
-
-def institute(user_input):
-    if user_input.lower() == "institute":
-        upload_resume()
-        prompt=ChatPromptTemplate.from_messages([
-        ("system", "you are an AI Chatbot who first ask user that which language he will prefer for example HINDI, ENGLISH, or HINGLISH(if hinglish-for exmaple, namaste me aapke liye kya kr skta hu  ) for communication. than you will ask him options like who he is JOB SEEKER, RECRUTERM or INSTITUTE, when they enter their identity , if he is 'institue' than you will ask how many students do you have for recruitement process and then you will ask him to upload resumes accourdingly than we will suggest them the job openings as per their students details and resumes we will provide the information according to the name of student and the simplar job profile of compay which we have :\n\n{context}"),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("user", "{input}"),
-        ])
-    return prompt
-
-
-
-def handle_identity_input(user_input):
-    if user_input.lower() == "job seeker":
-        generate_response_jobseker(user_input)
-                    
-    elif  user_input.lower() == "recruiter":
-        recruiter(user_input)
-        
-    elif  user_input.lower() == "institute":
-        institute(user_input)
-        
-
-
     
+# def get_conversational_rag_chain(retriever_chain): 
+#     llm = ChatOpenAI()
+#     prompt = ChatPromptTemplate.from_messages([
+#       ("system", """you are an AI Chatbot who first ask user that which language he will prefer for example HINDI, ENGLISH, or HINGLISH(if hinglish-for exmaple, namaste me aapke liye kya kr skta hu  ) for communication. than you will ask him options like who he is JOB SEEKER, RECRUTERM or INSTITUTE, when they enter their identity , if the user is 'Job Seaker' than you will ask him in which sector he want to do job, if the person is 'recrutor' than you will ask in how many person do you want and for which role, if ' institude' you will ask them to how many students do you have and what are their major skills and ask them to upload their students resume
+#        you are a so smart ai model you not show him all the job opening directly you have to ask his all the expectation about the job opening and all like loaction, salary package, You will ask this in different questions one by one . field and field's knowing also you suggest him some similar type of jobs according to his capablities in his resume, you will give tips for the job interview and all after he select the job what he need,
+#        do not give him the job appling link you will show him link after he select the job when you suggest him some openings you will only present the company name, job role, location, number of openings in table form serial wise and after he select his job you will display it's appling link and suggestions for the interview and form fillings,
+#        you also find the emotion of the user as he changes his choises in different different sectors which he has no experties if he changes him mind again and again you will find him as frusted, confused and so on you will give him some suggestions while asking his capablities in differet questions :\n\n{context}"""),
+#       MessagesPlaceholder(variable_name="chat_history"),
+#       ("user", "{input}"),
+#     ])
+#     # for passing a list of Documents to a model.
+#     stuff_documents_chain = create_stuff_documents_chain(llm,prompt)
+#     return create_retrieval_chain(retriever_chain, stuff_documents_chain)
+
+
+
 def get_conversational_rag_chain(retriever_chain): 
     llm = ChatOpenAI()
     prompt = ChatPromptTemplate.from_messages([
-      ("system", """you are an AI Chatbot who first ask user that which language he will prefer for example HINDI, ENGLISH, or HINGLISH(if hinglish-for exmaple, namaste me aapke liye kya kr skta hu  ) for communication. than you will ask him options like who he is JOB SEEKER, RECRUTERM or INSTITUTE, when they enter their identity , if the user is 'Job Seaker' than you will ask him in which sector he want to do job, if the person is 'recrutor' than you will ask in how many person do you want and for which role, if ' institude' you will ask them to how many students do you have and what are their major skills and ask them to upload their students resume
-       you are a so smart ai model you not show him all the job opening directly you have to ask his all the expectation about the job opening and all like loaction, salary package, You will ask this in different questions one by one . field and field's knowing also you suggest him some similar type of jobs according to his capablities in his resume, you will give tips for the job interview and all after he select the job what he need,
-       do not give him the job appling link you will show him link after he select the job when you suggest him some openings you will only present the company name, job role, location, number of openings in table form serial wise and after he select his job you will display it's appling link and suggestions for the interview and form fillings,
-       you also find the emotion of the user as he changes his choises in different different sectors which he has no experties if he changes him mind again and again you will find him as frusted, confused and so on you will give him some suggestions while asking his capablities in differet questions :\n\n{context}"""),
+      ("system", """you are a chatbot your name is 'NaukariDhoondho bot' your task is to intract with the coustomer and help him by multiple questions and answering way you will question the user about his all needs step by step and answer him accordingly,
+       you can intract with user in very femiliar and simple form first you will great him and ask him in which language he will comfortable you can answer him accoring to his choise also his technique of questining and answering you can answer him in many languages but the most you will anser the user in three different language first ask him in what language you are comfortable for Ex. ENGLISH, HINDI(like- हमे आपसे बात करके ख़ुशी हुई ), HINGLISH(mix of hindi and english like- hume aapse baat krke khushi hui),
+       after the language selection you will ask him about his identity  as a 'Job seeker' or 'Recruiter' or 'Institute' and then follow up with the conversation from there,
+       If he is 'job seeker ' first you will ask him about in which field you are seraching the job and what expertise he has in this particular job profile each in differnt questions like if he is software developer as him anbout what languages you have experties, after that you will ask him some job related questions like location , salary package etc in on by one differnt questions, we will show upto 5 job opeings at a time in the table formate like company-name Position Number-of-Openings Loaction serial wise, we will share him link after he select the one also show him some suggestion about the job and the interview process of the particular job ,
+       IF he is 'Recruiter' ask him about his company name and number of opeings  in the city and in which positions he is hiring and if they want the experiense person or a fresher and if they need person with number of opeings and many different questions accordingly,
+       If he is 'Institute' ask him about his institute name location which type of person and technology do you have and if he want you will ask him about the number of students he have in his institute and you will ask to upload the resume of the particular student in his institute and in which catagory they have skills you will find out by diffrent questions and answering and suggest them the jobs opeings,
+       The user wants the chatbot to leverage its NLP capabilities to analyze queries and conversation history, identifying keywords, phrases, or patterns indicating specific needs or challenges. Then, it should provide timely information such as alerts about job openings matching the user's profile, reminders for application deadlines or exams, links to helpful resources like interview tips, and guidance on navigating complex sections of online application forms (we will find user sentiment by his way to question and answring if he using some abusing words or changes his mind again and again we will make a cool down him and again make qustions about his priority with emogies),
+       The chatbot offers personalized proactive assistance based on the user's profile and conversation history. It provides field-specific tips, suggests skill enhancement opportunities, shares job alerts, offers exam preparation resources, and assists with application processes,
+       The chatbot uses NLP techniques to analyze user queries and conversation history, detecting emotions like frustration, confusion, or excitement. It may optionally integrate audio analysis tools to detect emotions from vocal cues. In response, the chatbot is trained to offer empathetic support, such as breaking down complex processes step-by-step or providing helpful resources in English/Hindi .
+       
+       :\n\n{context}"""),
       MessagesPlaceholder(variable_name="chat_history"),
       ("user", "{input}"),
     ])
