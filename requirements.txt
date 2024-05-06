@@ -1,0 +1,6 @@
+openai
+pinecone
+streamlit
+langchain
+pypdf
+dotenv
